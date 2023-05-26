@@ -1,7 +1,5 @@
 #include "parser/parser.hpp"
 
-#include <iostream>
-
 namespace arti::monkey {
 
     static const std::unordered_map<Token_t, expressions::Precedence> precedences{

@@ -1,7 +1,5 @@
 #include "lexer/lexer.hpp"
 
-#include <iostream>
-
 #include "utils/strings.hpp"
 
 namespace arti::monkey {

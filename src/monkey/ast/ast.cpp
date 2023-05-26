@@ -1,7 +1,6 @@
 #include "ast/ast.hpp"
 
 #include <sstream>
-#include <iostream>
 
 namespace arti::monkey {
 
