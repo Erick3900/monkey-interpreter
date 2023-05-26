@@ -1,0 +1,12 @@
+book/**
+
+.vim/**
+.cache/**
+
+[Cc]onan/**
+
+[Bb]uild/**
+[Bb]uild[Rr]elease/**
+[Bb]uild[Dd]ebug/**
+
+compile_commands.json
