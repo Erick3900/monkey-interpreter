@@ -54,6 +54,8 @@ namespace arti::monkey {
         }
 
         sourceStream = std::move(stream);
+
+        tokensGenerator = init();
     }
 
     Lexer::Lexer(std::unique_ptr<std::istream> sourceStream)
@@ -61,80 +63,114 @@ namespace arti::monkey {
         , position(0)
         , sourceCode()
         , sourcePath("stream")
-        , sourceStream(std::move(sourceStream)) { }
+        , sourceStream(std::move(sourceStream)) {
+        tokensGenerator = init();
+    }
 
-    nstd::generator<Token> Lexer::tokensIterator() {
+    void Lexer::forward() {
+        if (tokensIterator.handle == nullptr) {
+            tokensIterator = begin();
+        }
+        else {
+            ++tokensIterator;
+        }
+    }
+
+    Token Lexer::nextToken() {
+        if (tokensIterator.handle == nullptr) {
+            tokensIterator = begin();
+            return *tokensIterator;
+        }
+
+        ++tokensIterator;
+        return *tokensIterator;
+    }
+
+    Token Lexer::currentToken() {
+        if (tokensIterator.handle == nullptr) {
+            tokensIterator = begin();
+        }
+
+        return *tokensIterator;
+    }
+
+    Lexer::iterator Lexer::begin() {
+        return tokensGenerator.begin();
+    }
+
+    Lexer::iterator_sentinel Lexer::end() {
+        return tokensGenerator.end();
+    }
+
+    nstd::generator<Token> Lexer::init() {
         Token tok;
         std::string line;
 
         while (std::getline(*sourceStream, line)) {
             sourceCode.append(line);
             sourceCode.append("\n");
+        }
 
-            if (line.empty())
-                continue;
+        auto iter = sourceCode.begin();
 
-            auto iter = sourceCode.end() - line.size() - 1;
+        while (iter != sourceCode.end()) {
+            skipWhitespace(iter, sourceCode);
 
-            while (iter != sourceCode.end()) {
-                skipWhitespace(iter, sourceCode);
-
-                if (iter == sourceCode.end()) {
-                    break;
-                }
-
-                switch(*iter) {
-                    case '<': tok = tokens::Lt; break;
-                    case '>': tok = tokens::Gt; break;
-                    case '+': tok = tokens::Plus; break;
-                    case '-': tok = tokens::Minus; break;
-                    case ',': tok = tokens::Comma; break;
-                    case '/': tok = tokens::Slash; break;
-                    case '(': tok = tokens::LParen; break;
-                    case ')': tok = tokens::RParen; break;
-                    case '*': tok = tokens::Asterisk; break;
-                    case '{': tok = tokens::LSquirly; break;
-                    case '}': tok = tokens::RSquirly; break;
-                    case ';': tok = tokens::Semicolon; break;
-                    case '=':
-                        if (peek(iter, sourceCode) == '=') {
-                            ++iter;
-                            tok = tokens::Eq;
-                        }
-                        else {
-                            tok = tokens::Assign;
-                        }
-                        break;
-                    case '!':
-                        if (peek(iter, sourceCode) == '=') {
-                            ++iter;
-                            tok = tokens::Ne;
-                        }
-                        else {
-                            tok = tokens::Bang;
-                        }
-                        break;
-                    default:
-                        if (str::isLetter(*iter)) {
-                            tok.literal = readIdentifier({ iter, sourceCode.end() });
-                            tok.type = lookupIdent(tok.literal);
-                            iter += (tok.literal.length() - 1);
-                        }
-                        else if (str::isDigit(*iter)) {
-                            tok = tokens::Int;
-                            tok.literal = readNumber({ iter, sourceCode.end() });
-                            iter += (tok.literal.length() - 1);
-                        }
-                        else {
-                            tok = tokens::Illegal;
-                            tok.literal = std::string_view{ iter, iter + 1 };
-                        }
-                        break;
-                }
-
-                ++iter;
-                co_yield tok;
+            if (iter == sourceCode.end()) {
+                break;
             }
+
+            switch(*iter) {
+                case '<': tok = tokens::Lt; break;
+                case '>': tok = tokens::Gt; break;
+                case '+': tok = tokens::Plus; break;
+                case '-': tok = tokens::Minus; break;
+                case ',': tok = tokens::Comma; break;
+                case '/': tok = tokens::Slash; break;
+                case '(': tok = tokens::LParen; break;
+                case ')': tok = tokens::RParen; break;
+                case '*': tok = tokens::Asterisk; break;
+                case '{': tok = tokens::LSquirly; break;
+                case '}': tok = tokens::RSquirly; break;
+                case ';': tok = tokens::Semicolon; break;
+                case '=':
+                    if (peek(iter, sourceCode) == '=') {
+                        ++iter;
+                        tok = tokens::Eq;
+                    }
+                    else {
+                        tok = tokens::Assign;
+                    }
+                    break;
+                case '!':
+                    if (peek(iter, sourceCode) == '=') {
+                        ++iter;
+                        tok = tokens::Ne;
+                    }
+                    else {
+                        tok = tokens::Bang;
+                    }
+                    break;
+                default:
+                    if (str::isLetter(*iter)) {
+                        tok.literal = readIdentifier({ iter, sourceCode.end() });
+                        tok.type = lookupIdent(tok.literal);
+                        iter += (tok.literal.length() - 1);
+                    }
+                    else if (str::isDigit(*iter)) {
+                        tok = tokens::Int;
+                        tok.literal = readNumber({ iter, sourceCode.end() });
+                        iter += (tok.literal.length() - 1);
+                    }
+                    else {
+                        tok = tokens::Illegal;
+                        tok.literal = std::string_view{ iter, iter + 1 };
+                    }
+                    break;
+            }
+
+            ++iter;
+            co_yield tok;
         }
 
         tok = tokens::EOF;

@@ -99,13 +99,12 @@ TEST(lexer, next_token) {
     };
 
     auto lexer = Lexer{ "../tests/lexer/next_token.mnky" };
-    auto tokensGenerator = lexer.tokensIterator();
-    auto tokensIter = tokensGenerator.begin();
+    auto tokensIter = lexer.begin();
 
     std::ranges::for_each(
         expected_tokens,
         [&](const auto &expected_token) {
-            EXPECT_NE(tokensIter, tokensGenerator.end());
+            EXPECT_NE(tokensIter, lexer.end());
 
             auto token = *tokensIter;
             ++tokensIter;
@@ -115,7 +114,7 @@ TEST(lexer, next_token) {
         }
     );
 
-    EXPECT_EQ(tokensIter, tokensGenerator.end());
+    EXPECT_EQ(tokensIter, lexer.end());
 }
 
 int main(int argc, char *argv[]) {

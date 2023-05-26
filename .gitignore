@@ -1,7 +1,10 @@
 book/**
 
 .vim/**
+.idea/**
 .cache/**
+
+.arti/**/.cache.lua
 
 [Cc]onan/**
 
@@ -9,4 +12,8 @@ book/**
 [Bb]uild[Rr]elease/**
 [Bb]uild[Dd]ebug/**
 
+cmake-build-**/**
+
 compile_commands.json
+
+.luarc.json

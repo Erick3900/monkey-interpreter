@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
         if (std::filesystem::exists(file)) {
             auto lexer = arti::monkey::Lexer{ file };
 
-            for (const auto &token : lexer.tokensIterator()) {
+            for (const auto &token : lexer) {
                 std::cout << token << std::endl;
             }
         }

@@ -5,7 +5,7 @@
 
 #include <fmt/format.h>
 
-#include "lexer/lexer.hpp"
+#include "parser/parser.hpp"
 
 namespace arti::monkey::repl {
 
@@ -30,10 +30,15 @@ namespace arti::monkey::repl {
                     }
                 }
                 else {
-                    auto lexer = Lexer{ std::make_unique<std::stringstream>( line ) };
+                    auto parser = Parser{ std::make_unique<Lexer>(std::make_unique<std::stringstream>(line)) };
 
-                    for (const auto &token : lexer.tokensIterator()) {
-                        std::cout << token << std::endl;
+                    auto valid_program = parser.parseProgram();
+
+                    if (not valid_program) {
+                        std::cout << "Error: " << valid_program.error() << std::endl;
+                    }
+                    else {
+                        std::cout << valid_program.value()->toString() << std::endl;
                     }
                 }
             }

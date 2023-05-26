@@ -6,3 +6,4 @@
 * Support for comments
 * Generalize the lexer so it can be used on the REPL
 * Create a "SourceStream" generator class
+* Support for multiple errors (do not stop at first error?)

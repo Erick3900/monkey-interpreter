@@ -50,9 +50,7 @@ return {
     {
         name = "TestCurrent",
         program = ws.build_dir .. dirsep .. getTestName(file),
-        args = {
-            "--gtest_break_on_failure"
-        },
+        args = { },
         cwd = ws.build_dir,
         depends = {
             "Build"

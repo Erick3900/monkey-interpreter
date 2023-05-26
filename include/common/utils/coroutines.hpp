@@ -146,6 +146,7 @@ namespace nstd {
         using handle_type = std::coroutine_handle<promise_type>;
 
         using iterator = impl::generator_iterator<T>;
+        using iterator_sentinel = impl::generator_sentinel;
 
         generator() = default;
 

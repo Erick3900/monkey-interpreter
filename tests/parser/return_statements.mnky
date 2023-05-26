@@ -1,0 +1,3 @@
+return 5;
+return 10;
+return foobar + 9993322;
