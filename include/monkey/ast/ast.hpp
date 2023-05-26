@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <vector>
 #include <memory>
 
@@ -9,21 +10,19 @@
 namespace arti::monkey {
 
     struct ASTNode {
-        virtual std::string_view tokenLiteral() const = 0;
+        Token token;
+
         virtual std::string toString() const = 0;
+        virtual std::string_view tokenLiteral() const;
     };
 
     struct Identifier : public ASTNode {
-        Token token;
         std::string_view value;
 
-        std::string_view tokenLiteral() const override;
         std::string toString() const override;
     };
 
     struct LetStatement : public ASTNode {
-        Token token;
-
         Identifier *name;
         ASTNode *value; // Expression
 
@@ -36,13 +35,10 @@ namespace arti::monkey {
         LetStatement &operator=(LetStatement &&) = default;
         LetStatement &operator=(const LetStatement &) = default;
 
-        std::string_view tokenLiteral() const override;
         std::string toString() const override;
     };
 
     struct ReturnStatement : public ASTNode {
-        Token token;
-
         ASTNode *returnValue;
 
         ReturnStatement();
@@ -54,13 +50,10 @@ namespace arti::monkey {
         ReturnStatement &operator=(ReturnStatement &&) = default;
         ReturnStatement &operator=(const ReturnStatement &) = default;
 
-        std::string_view tokenLiteral() const override;
         std::string toString() const override;
     };
 
     struct ExpressionStatement : public ASTNode {
-        Token token;
-
         ASTNode *expression;
 
         ExpressionStatement();
@@ -72,13 +65,10 @@ namespace arti::monkey {
         ExpressionStatement &operator=(ExpressionStatement &&) = default;
         ExpressionStatement &operator=(const ExpressionStatement &) = default;
 
-        std::string_view tokenLiteral() const override;
         std::string toString() const override;
     };
 
     struct IntegerLiteral : public ASTNode {
-        Token token;
-
         int64_t value;
 
         IntegerLiteral();
@@ -90,13 +80,10 @@ namespace arti::monkey {
         IntegerLiteral &operator=(IntegerLiteral &&) = default;
         IntegerLiteral &operator=(const IntegerLiteral &) = default;
 
-        std::string_view tokenLiteral() const override;
         std::string toString() const override;
     };
 
     struct PrefixExpression : public ASTNode {
-        Token token;
-
         ASTNode *right;
         std::string_view op;
 
@@ -109,13 +96,10 @@ namespace arti::monkey {
         PrefixExpression &operator=(PrefixExpression &&) = default;
         PrefixExpression &operator=(const PrefixExpression &) = default;
 
-        std::string_view tokenLiteral() const override;
         std::string toString() const override;
     };
 
     struct InfixExpression : public ASTNode {
-        Token token;
-
         ASTNode *left;
         ASTNode *right;
 
@@ -130,13 +114,42 @@ namespace arti::monkey {
         InfixExpression &operator=(InfixExpression &&) = default;
         InfixExpression &operator=(const InfixExpression &) = default;
 
-        std::string_view tokenLiteral() const override;
+        std::string toString() const override;
+    };
+
+    struct BlockStatement : public ASTNode {
+        std::vector<ASTNode *> statements;
+
+        BlockStatement();
+        ~BlockStatement() = default;
+
+        BlockStatement(BlockStatement &&) = default;
+        BlockStatement(const BlockStatement &) = default;
+
+        BlockStatement &operator=(BlockStatement &&) = default;
+        BlockStatement &operator=(const BlockStatement &) = default;
+
+        std::string toString() const override;
+    };
+
+    struct IfExpression : public ASTNode {
+        ASTNode *condition;
+        BlockStatement *consequence;
+        BlockStatement *alternative;
+
+        IfExpression();
+        ~IfExpression() = default;
+
+        IfExpression(IfExpression &&) = default;
+        IfExpression(const IfExpression &) = default;
+
+        IfExpression &operator=(IfExpression &&) = default;
+        IfExpression &operator=(const IfExpression &) = default;
+
         std::string toString() const override;
     };
 
     struct BooleanLiteral : public ASTNode {
-        Token token;
-
         bool value;
 
         BooleanLiteral();
@@ -148,12 +161,45 @@ namespace arti::monkey {
         BooleanLiteral &operator=(BooleanLiteral &&) = default;
         BooleanLiteral &operator=(const BooleanLiteral &) = default;
 
-        std::string_view tokenLiteral() const override;
+        std::string toString() const override;
+    };
+
+    struct FunctionLiteral : public ASTNode {
+        std::vector<Identifier *> parameters;
+
+        BlockStatement *statement;
+
+        FunctionLiteral();
+        ~FunctionLiteral() = default;
+
+        FunctionLiteral(FunctionLiteral &&) = default;
+        FunctionLiteral(const FunctionLiteral &) = default;
+
+        FunctionLiteral &operator=(FunctionLiteral &&) = default;
+        FunctionLiteral &operator=(const FunctionLiteral &) = default;
+
+        std::string toString() const override;
+    };
+
+    struct CallExpression : public ASTNode {
+        ASTNode *function;
+
+        std::vector<ASTNode *> arguments;
+
+        CallExpression();
+        ~CallExpression() = default;
+
+        CallExpression(CallExpression &&) = default;
+        CallExpression(const CallExpression &) = default;
+
+        CallExpression &operator=(CallExpression &&) = default;
+        CallExpression &operator=(const CallExpression &) = default;
+
         std::string toString() const override;
     };
 
     struct Program {
-        std::vector<std::unique_ptr<ASTNode>> astNodes;
+        std::list<std::unique_ptr<ASTNode>> astNodes;
 
         std::vector<ASTNode *> statements;
 

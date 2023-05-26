@@ -89,6 +89,11 @@ foreach(FILE IN LISTS TESTS)
             ${FILE}
     )
 
+    target_include_directories(
+        ${TestName}_test PRIVATE
+            tests/include
+    )
+
     target_link_libraries(
         ${TestName}_test PRIVATE
             GTest::gtest

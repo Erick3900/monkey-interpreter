@@ -1,12 +1,14 @@
 #include "ast/ast.hpp"
 
 #include <sstream>
+#include <algorithm>
 
 namespace arti::monkey {
 
-    std::string_view Identifier::tokenLiteral() const {
+    std::string_view ASTNode::tokenLiteral() const {
         return token.literal;
     }
+
 
     std::string Identifier::toString() const {
         return std::string{ value };
@@ -14,13 +16,8 @@ namespace arti::monkey {
 
 
     LetStatement::LetStatement()
-        : token{}
-        , name(nullptr)
+        : name(nullptr)
         , value(nullptr) {}
-
-    std::string_view LetStatement::tokenLiteral() const {
-        return token.literal;
-    }
 
     std::string LetStatement::toString() const {
         std::stringstream ss;
@@ -38,12 +35,7 @@ namespace arti::monkey {
 
 
     ReturnStatement::ReturnStatement()
-        : token{}
-        , returnValue(nullptr) {}
-
-    std::string_view ReturnStatement::tokenLiteral() const {
-        return token.literal;
-    }
+        : returnValue(nullptr) {}
 
     std::string ReturnStatement::toString() const {
         std::stringstream ss;
@@ -61,12 +53,7 @@ namespace arti::monkey {
 
 
     ExpressionStatement::ExpressionStatement()
-        : token{}
-        , expression(nullptr) {}
-
-    std::string_view ExpressionStatement::tokenLiteral() const {
-        return token.literal;
-    }
+        : expression(nullptr) {}
 
     std::string ExpressionStatement::toString() const {
         if (expression) {
@@ -78,12 +65,7 @@ namespace arti::monkey {
 
 
     IntegerLiteral::IntegerLiteral()
-        : token{}
-        , value(0) {}
-
-    std::string_view IntegerLiteral::tokenLiteral() const {
-        return token.literal;
-    }
+        : value(0) {}
 
     std::string IntegerLiteral::toString() const {
         return fmt::to_string(value);
@@ -91,13 +73,8 @@ namespace arti::monkey {
 
 
     PrefixExpression::PrefixExpression()
-        : token{}
-        , right(nullptr)
+        : right(nullptr)
         , op{} {}
-
-    std::string_view PrefixExpression::tokenLiteral() const {
-        return token.literal;
-    }
 
     std::string PrefixExpression::toString() const {
         std::stringstream ss;
@@ -108,15 +85,41 @@ namespace arti::monkey {
     }
 
 
+    BlockStatement::BlockStatement()
+        : statements{} {}
+
+    std::string BlockStatement::toString() const {
+        std::stringstream ss;
+
+        for (auto statement : statements) {
+            ss << statement->toString();
+        }
+
+        return ss.str();
+    }
+
+    IfExpression::IfExpression()
+        : condition(nullptr)
+        , consequence(nullptr)
+        , alternative(nullptr) {}
+
+    std::string IfExpression::toString() const {
+        std::stringstream ss;
+
+        ss << "if " << condition->toString() << " " << consequence->toString();
+
+        if (alternative != nullptr) {
+            ss << "else " << alternative->toString();
+        }
+
+        return ss.str();
+    }
+
+
     InfixExpression::InfixExpression()
-        : token{}
-        , left(nullptr)
+        : left(nullptr)
         , right(nullptr)
         , op{} {}
-
-    std::string_view InfixExpression::tokenLiteral() const {
-        return token.literal;
-    }
 
     std::string InfixExpression::toString() const {
         std::stringstream ss;
@@ -128,12 +131,7 @@ namespace arti::monkey {
 
 
     BooleanLiteral::BooleanLiteral()
-        : token{}
-        , value{false} {}
-
-    std::string_view BooleanLiteral::tokenLiteral() const {
-        return token.literal;
-    }
+        : value{false} {}
 
     std::string BooleanLiteral::toString() const {
         return fmt::to_string(value);
@@ -146,6 +144,46 @@ namespace arti::monkey {
         for (auto node : statements) {
             ss << node->toString();
         }
+
+        return ss.str();
+    }
+
+
+    FunctionLiteral::FunctionLiteral()
+        : parameters{}
+        , statement(nullptr) {}
+
+    std::string FunctionLiteral::toString() const {
+        std::stringstream ss;
+
+        std::list<std::string> parametersStrs;
+
+        std::ranges::for_each(parameters, [&](Identifier *p) {
+            parametersStrs.emplace_back(p->toString());
+        });
+
+        ss << tokenLiteral();
+        ss << fmt::format("({})", fmt::join(parametersStrs, ", "));
+        ss << statement->toString();
+
+        return ss.str();
+    }
+
+    CallExpression::CallExpression()
+        : function(nullptr) 
+        , arguments{} {}
+
+    std::string CallExpression::toString() const {
+        std::stringstream ss;
+
+        std::list<std::string> argsStrs;
+
+        std::ranges::for_each(arguments, [&](ASTNode *a) {
+            argsStrs.emplace_back(a->toString());
+        });
+
+        ss << function->toString();
+        ss << fmt::format("({})", fmt::join(argsStrs, ", "));
 
         return ss.str();
     }

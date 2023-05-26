@@ -23,6 +23,10 @@ R"(((-a) * b)
 ((5 > 4) == (3 < 4))
 ((5 < 4) != (3 > 4))
 ((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))
+true
+false
+((3 > 5) == false)
+((3 < 5) == true)
 )";
 
 TEST(parser, operator_precedence) {

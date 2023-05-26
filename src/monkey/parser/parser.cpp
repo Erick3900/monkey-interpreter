@@ -14,6 +14,8 @@ namespace arti::monkey {
 
         { tokens::Slash.type   , expressions::Precedence::PRODUCT },
         { tokens::Asterisk.type, expressions::Precedence::PRODUCT },
+
+        { tokens::LParen.type, expressions::Precedence::CALL },
     };
 
     Parser::Parser(std::unique_ptr<Lexer> lexer)
@@ -34,7 +36,12 @@ namespace arti::monkey {
 
         registerPrefix(tokens::True.type, std::bind_front(&Parser::parseBooleanLiteral, this));
         registerPrefix(tokens::False.type, std::bind_front(&Parser::parseBooleanLiteral, this));
-        
+
+        registerPrefix(tokens::LParen.type, std::bind_front(&Parser::parseGroupedExpression, this));
+
+        registerPrefix(tokens::If.type, std::bind_front(&Parser::parseIfExpression, this));
+        registerPrefix(tokens::Function.type, std::bind_front(&Parser::parseFunctionLiteral, this));
+
         registerInfix(tokens::Plus.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Minus.type, std::bind_front(&Parser::parseInfixExpression, this));
 
@@ -46,6 +53,8 @@ namespace arti::monkey {
 
         registerInfix(tokens::Lt.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Gt.type, std::bind_front(&Parser::parseInfixExpression, this));
+
+        registerInfix(tokens::LParen.type, std::bind_front(&Parser::parseCallExpression, this));
     }
 
     void Parser::registerInfix(Token_t tokenType, InfixParseFn fn) {
@@ -65,12 +74,12 @@ namespace arti::monkey {
         auto program = std::make_unique<Program>();
 
         while (currentToken.type != tokens::EOF.type) {
-            auto statement_exp = parseStatement(program.get());
+            auto statementExp = parseStatement(program.get());
 
-            if (statement_exp.has_value()) {
-                program->statements.push_back(statement_exp.value());
+            if (statementExp.has_value()) {
+                program->statements.push_back(statementExp.value());
             }
-            else return tl::unexpected<std::string>{ statement_exp.error() };
+            else return tl::unexpected<std::string>{ statementExp.error() };
 
             nextToken();
         }
@@ -148,15 +157,15 @@ namespace arti::monkey {
         auto newStatement = program->newNode<ExpressionStatement>();
         newStatement->token = currentToken;
 
-        auto expression_expected = parseExpression(program, expressions::Precedence::LOWEST);
+        auto expressionExpected = parseExpression(program, expressions::Precedence::LOWEST);
 
-        if (not expression_expected) {
-            return expression_expected;
+        if (not expressionExpected) {
+            return expressionExpected;
         }
 
-        newStatement->expression = expression_expected.value();
+        newStatement->expression = expressionExpected.value();
 
-        if (auto expected = peekTokenIs(tokens::Semicolon.type); expected) {
+        if (peekTokenIs(tokens::Semicolon.type)) {
             nextToken();
         }
 
@@ -207,64 +216,266 @@ namespace arti::monkey {
     }
 
     tl::expected<ASTNode *, std::string> Parser::parseIntegerLiteral(Program *program) {
-        auto newIdentifier = program->newNode<IntegerLiteral>();
-        newIdentifier->token = currentToken;
+        auto newLiteral = program->newNode<IntegerLiteral>();
+        newLiteral->token = currentToken;
 
         try {
             auto literal = std::stoll(currentToken.literal.data());
-            newIdentifier->value = literal;
+            newLiteral->value = literal;
         }
         catch(std::exception &err) {
             return tl::unexpected<std::string>{ fmt::format("Couldn't parse '{}' as an integer literal", currentToken.literal) };
         }
 
-        return newIdentifier;
+        return newLiteral;
     }
 
     tl::expected<ASTNode *, std::string> Parser::parseBooleanLiteral(Program *program) {
-        auto newIdentifier = program->newNode<BooleanLiteral>();
-        newIdentifier->token = currentToken;
-        newIdentifier->value = currentTokenIs(tokens::True.type).has_value();
-        return newIdentifier;
+        auto newLiteral = program->newNode<BooleanLiteral>();
+        newLiteral->token = currentToken;
+        newLiteral->value = currentTokenIs(tokens::True.type).has_value();
+        return newLiteral;
     }
 
     tl::expected<ASTNode *, std::string> Parser::parsePrefixExpression(Program *program) {
-        auto newIdentifier = program->newNode<PrefixExpression>();
-        newIdentifier->token = currentToken;
-        newIdentifier->op = currentToken.literal;
+        auto newExpression = program->newNode<PrefixExpression>();
+        newExpression->token = currentToken;
+        newExpression->op = currentToken.literal;
 
         nextToken();
 
-        auto expression_expected = parseExpression(program, expressions::Precedence::PREFIX);
+        auto expressionExpected = parseExpression(program, expressions::Precedence::PREFIX);
 
-        if (not expression_expected) {
-            return expression_expected;
+        if (not expressionExpected) {
+            return expressionExpected;
         }
 
-        newIdentifier->right = expression_expected.value();
+        newExpression->right = expressionExpected.value();
 
-        return newIdentifier;
+        return newExpression;
+    }
+
+    tl::expected<ASTNode *, std::string> Parser::parseGroupedExpression(Program *program) {
+        nextToken();
+
+        auto expressionExpected = parseExpression(program, expressions::Precedence::LOWEST);
+
+        if (not expressionExpected) {
+            return expressionExpected;
+        }
+
+        if (auto expected = expectPeek(tokens::RParen.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        return expressionExpected.value();
+    }
+
+    tl::expected<ASTNode *, std::string> Parser::parseIfExpression(Program *program) {
+        auto newExpression = program->newNode<IfExpression>();
+        newExpression->token = currentToken;
+
+        if (auto expected = expectPeek(tokens::LParen.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        nextToken();
+
+        auto expectedCondition = parseExpression(program, expressions::Precedence::LOWEST);
+
+        if (not expectedCondition) {
+            return expectedCondition;
+        }
+
+        newExpression->condition = expectedCondition.value();
+
+        if (auto expected = expectPeek(tokens::RParen.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        if (auto expected = expectPeek(tokens::LSquirly.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        auto expectedBlock = parseBlockStatement(program);
+
+        if (not expectedBlock) {
+            return expectedBlock;
+        }
+
+        newExpression->consequence = static_cast<BlockStatement *>(expectedBlock.value());
+
+        if (peekTokenIs(tokens::Else.type)) {
+            nextToken();
+
+            if (auto expected = expectPeek(tokens::LSquirly.type); not expected) {
+                return tl::unexpected{ std::move(expected).error() };
+            }
+
+            auto expectedElseBlock = parseBlockStatement(program);
+
+            if (not expectedElseBlock) {
+                return expectedElseBlock;
+            }
+
+            newExpression->alternative = static_cast<BlockStatement *>(expectedElseBlock.value());
+        }
+
+        return newExpression;
+    }
+
+    tl::expected<ASTNode *, std::string> Parser::parseBlockStatement(Program *program) {
+        auto newStatement = program->newNode<BlockStatement>();
+        newStatement->token = currentToken;
+
+        nextToken();
+
+        while (not currentTokenIs(tokens::RSquirly.type) and not currentTokenIs(tokens::EOF.type)) {
+            auto expectedStatement = parseStatement(program);
+
+            if (not expectedStatement) {
+                return expectedStatement;
+            }
+
+            newStatement->statements.push_back(expectedStatement.value());
+
+            nextToken();
+        }
+
+        return newStatement;
+    }
+
+    tl::expected<ASTNode *, std::string> Parser::parseFunctionLiteral(Program *program) {
+        auto newLiteral = program->newNode<FunctionLiteral>();
+        newLiteral->token = currentToken;
+
+        if (auto expected = expectPeek(tokens::LParen.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        auto expectedParameter = parseFunctionParameters(program);
+
+        if (not expectedParameter) {
+            return tl::unexpected<std::string>{ std::move(expectedParameter).error() };
+        }
+
+        newLiteral->parameters = std::move(expectedParameter).value();
+
+        if (auto expected = expectPeek(tokens::LSquirly.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        } 
+
+        auto expectedBlock = parseBlockStatement(program);
+
+        if (not expectedBlock) {
+            return expectedBlock;
+        }
+
+        newLiteral->statement = static_cast<BlockStatement *>(expectedBlock.value());
+
+        return newLiteral;
+    }
+
+    tl::expected<std::vector<Identifier *>, std::string> Parser::parseFunctionParameters(Program *program) {
+        std::vector<Identifier *> identifiers;
+
+        if (peekTokenIs(tokens::RParen.type)) {
+            nextToken();
+            return identifiers;
+        }
+
+        nextToken();
+
+        identifiers.push_back(static_cast<Identifier *>(parseIdentifier(program).value()));
+
+        while (peekTokenIs(tokens::Comma.type)) {
+            nextToken();
+            nextToken();
+
+            identifiers.push_back(static_cast<Identifier *>(parseIdentifier(program).value()));
+        }
+
+        if (auto expected = expectPeek(tokens::RParen.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        return identifiers;
+    }
+
+    tl::expected<ASTNode *, std::string> Parser::parseCallExpression(Program *program, ASTNode *left) {
+        auto newExpression = program->newNode<CallExpression>();
+        newExpression->token = currentToken;
+        newExpression->function = left;
+
+        auto expectedArgs = parseCallArguments(program);
+
+        if (not expectedArgs) {
+            return tl::unexpected{ std::move(expectedArgs).error() };
+        }
+
+        newExpression->arguments = std::move(expectedArgs).value();
+
+        return newExpression;
+    }
+
+    tl::expected<std::vector<ASTNode *>, std::string> Parser::parseCallArguments(Program *program) {
+        std::vector<ASTNode *> args;
+
+        nextToken();
+
+        if (peekTokenIs(tokens::RParen.type)) {
+            return args;
+        }
+
+        tl::expected<ASTNode *, std::string> expectedExpression;
+
+        expectedExpression = parseExpression(program, expressions::Precedence::LOWEST);
+
+        if (not expectedExpression) {
+            return tl::unexpected{ std::move(expectedExpression).error() };
+        }
+
+        args.push_back(expectedExpression.value());
+
+        while (peekTokenIs(tokens::Comma.type)) {
+            nextToken();
+            nextToken();
+
+            expectedExpression = parseExpression(program, expressions::Precedence::LOWEST);
+
+            if (not expectedExpression) {
+                return tl::unexpected{ std::move(expectedExpression).error() };
+            }
+
+            args.push_back(expectedExpression.value());
+        }
+
+        if (auto expected = expectPeek(tokens::RParen.type); not expected) {
+            return tl::unexpected{ std::move(expected).error() };
+        }
+
+        return args;
     }
 
     tl::expected<ASTNode *, std::string> Parser::parseInfixExpression(Program *program, ASTNode *left) {
-        auto newIdentifier = program->newNode<InfixExpression>();
-        newIdentifier->token = currentToken;
-        newIdentifier->op = currentToken.literal;
-        newIdentifier->left = left;
+        auto newExpression = program->newNode<InfixExpression>();
+        newExpression->token = currentToken;
+        newExpression->op = currentToken.literal;
+        newExpression->left = left;
 
         auto precedence = currentPrecedence();
 
         nextToken();
 
-        auto expression_expected = parseExpression(program, precedence);
+        auto expressionExpected = parseExpression(program, precedence);
 
-        if (not expression_expected) {
-            return expression_expected;
+        if (not expressionExpected) {
+            return expressionExpected;
         }
 
-        newIdentifier->right = expression_expected.value();
+        newExpression->right = expressionExpected.value();
 
-        return newIdentifier;
+        return newExpression;
     }
 
     expressions::Precedence Parser::peekPrecedence() {
