@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <cassert>
 
-#include "lexer/lexer.hpp"
+#include <fmt/format.h>
+
 #include "ast/ast.hpp"
+#include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
 
 tl::expected<void, std::string> testStatement(arti::monkey::ASTNode *statement, std::string_view identifier);

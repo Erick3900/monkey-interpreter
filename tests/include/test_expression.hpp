@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <fmt/format.h>
 #include <tl/expected.hpp>
 
 #include "ast/ast.hpp"

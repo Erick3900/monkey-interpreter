@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
             auto lexer = arti::monkey::Lexer{ file };
 
             for (const auto &token : lexer) {
-                std::cout << token << std::endl;
+                // std::cout << token << std::endl;
             }
         }
         else {

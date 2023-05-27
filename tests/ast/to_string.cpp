@@ -6,9 +6,10 @@
 #include <algorithm>
 #include <cassert>
 
-#include "lexer/lexer.hpp"
 #include "ast/ast.hpp"
+#include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
+#include "token/token_definitions.hpp"
 
 TEST(ast, to_string) {
     using namespace arti::monkey;

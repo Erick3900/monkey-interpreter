@@ -1,6 +1,9 @@
 #include "lexer/lexer.hpp"
 
+#include <fmt/format.h>
+
 #include "utils/strings.hpp"
+#include "token/token_definitions.hpp"
 
 namespace arti::monkey {
 

@@ -3,11 +3,11 @@
 #include <array>
 #include <ranges>
 #include <sstream>
-#include <algorithm>
 #include <cassert>
+#include <algorithm>
 
-#include "lexer/lexer.hpp"
 #include "ast/ast.hpp"
+#include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
 
 constexpr auto expectedOutput = 

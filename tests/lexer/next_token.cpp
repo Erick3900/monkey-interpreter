@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "lexer/lexer.hpp"
+#include "token/token_definitions.hpp"
 
 TEST(lexer, next_token) {
     using namespace arti::monkey;
