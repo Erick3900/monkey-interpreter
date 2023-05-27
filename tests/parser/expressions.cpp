@@ -110,6 +110,54 @@ TEST(parser, integer_literal_expression) {
     }
 }
 
+TEST(parser, boolean_literal_expression) {
+    using namespace arti::monkey;
+
+    constexpr std::array<bool, 2> expectedIntegers{
+        true,
+        false
+    };
+
+    auto parser = []{
+        constexpr std::string_view input_path = "../tests/parser/boolean_literal_expression.mnky";
+
+        auto lexer = std::make_unique<Lexer>(input_path);
+
+        return std::make_unique<Parser>(std::move(lexer));
+    }();
+
+    auto program_ex = parser->parseProgram();
+
+    if (not program_ex) {
+        throw std::runtime_error(program_ex.error());
+    }
+
+    auto program = std::move(program_ex).value();
+
+    if(program->statements.size() != expectedIntegers.size()) {
+        EXPECT_EQ(program->statements.size(), expectedIntegers.size());
+        FAIL();
+    }
+
+    for (size_t i = 0; i < expectedIntegers.size(); ++i) {
+        auto node = program->statements.at(0);
+        auto expInt = expectedIntegers.at(0);
+
+        if (auto isExpression = tests::testExpression(node); isExpression) {
+            node = isExpression.value();
+
+            auto expectedOk = tests::testBooleanLiteral(node, expInt);
+
+            if (not expectedOk) {
+                throw std::runtime_error(expectedOk.error());
+            }
+        }
+        else {
+            throw std::runtime_error(isExpression.error());
+        }
+    }
+}
+
 TEST(parser, prefix_expression) {
     using namespace arti::monkey;
 

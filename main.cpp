@@ -7,7 +7,7 @@
 #include <docopt/docopt.h>
 
 #include "repl/loop.hpp"
-#include "lexer/lexer.hpp"
+#include "parser/parser.hpp"
 
 const auto Usage{
     fmt::format(
@@ -44,10 +44,15 @@ int main(int argc, char* argv[]) {
         auto file = options.at("<file>").asString();
 
         if (std::filesystem::exists(file)) {
-            auto lexer = arti::monkey::Lexer{ file };
+            auto parser = arti::monkey::Parser{ std::make_unique<arti::monkey::Lexer>(std::make_unique<std::ifstream>(file)) };
 
-            for (const auto &token : lexer) {
-                // std::cout << token << std::endl;
+            auto valid_program = parser.parseProgram();
+
+            if (not valid_program) {
+                std::cout << "Error: " << valid_program.error() << std::endl;
+            }
+            else {
+                std::cout << valid_program.value()->toString() << std::endl;
             }
         }
         else {
