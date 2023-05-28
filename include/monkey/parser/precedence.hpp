@@ -6,12 +6,14 @@ namespace arti::monkey {
         enum Precedence {
             _,
             LOWEST,
+            ASSIGN,
             EQUALS,
             LESS_GREATER,
             SUM,
             PRODUCT,
             PREFIX,
-            CALL
+            CALL,
+            INDEX,
         };
     }
 

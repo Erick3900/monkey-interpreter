@@ -10,7 +10,7 @@ namespace arti::monkey {
         auto prefixFn = prefixParseFns.find(currentToken.type);
 
         if (prefixFn == prefixParseFns.end()) {
-            return tl::unexpected<std::string>{ fmt::format("Unknown expression type, no parser available for '{}'", currentToken.type) };
+            return tl::unexpected<std::string>{ fmt::format("Unknown expression type, no parser available for '{}: {}'", currentToken.type, currentToken.literal) };
         }
 
         auto expectedExpr = prefixFn->second(program);
@@ -41,5 +41,4 @@ namespace arti::monkey {
 
         return leftExpr;
     }
-
 }

@@ -7,19 +7,24 @@
 namespace arti::monkey {
 
     static const std::unordered_map<Token_t, expressions::Precedence> precedences{
-        { tokens::Eq.type, expressions::Precedence::EQUALS },
-        { tokens::Ne.type, expressions::Precedence::EQUALS },
+        {      tokens::Eq.type,       expressions::Precedence::EQUALS},
+        {      tokens::Ne.type,       expressions::Precedence::EQUALS},
 
-        { tokens::Lt.type, expressions::Precedence::LESS_GREATER },
-        { tokens::Gt.type, expressions::Precedence::LESS_GREATER },
+        {      tokens::Lt.type, expressions::Precedence::LESS_GREATER},
+        {      tokens::Gt.type, expressions::Precedence::LESS_GREATER},
 
-        { tokens::Plus.type , expressions::Precedence::SUM },
-        { tokens::Minus.type, expressions::Precedence::SUM },
+        {    tokens::Plus.type,          expressions::Precedence::SUM},
+        {   tokens::Minus.type,          expressions::Precedence::SUM},
 
-        { tokens::Slash.type   , expressions::Precedence::PRODUCT },
-        { tokens::Asterisk.type, expressions::Precedence::PRODUCT },
+        {   tokens::Slash.type,      expressions::Precedence::PRODUCT},
+        {tokens::Asterisk.type,      expressions::Precedence::PRODUCT},
+        {     tokens::Mod.type,      expressions::Precedence::PRODUCT},
 
-        { tokens::LParen.type, expressions::Precedence::CALL },
+        {  tokens::LParen.type,         expressions::Precedence::CALL},
+
+        {  tokens::Assign.type,       expressions::Precedence::ASSIGN},
+
+        {tokens::LBracket.type,        expressions::Precedence::INDEX}
     };
 
     Parser::Parser(std::unique_ptr<Lexer> lexer)
@@ -34,26 +39,38 @@ namespace arti::monkey {
 
         registerPrefix(tokens::Ident.type, std::bind_front(&Parser::parseIdentifier, this));
         registerPrefix(tokens::Int.type, std::bind_front(&Parser::parseIntegerLiteral, this));
+        registerPrefix(tokens::String.type, std::bind_front(&Parser::parseStringLiteral, this));
+        registerPrefix(tokens::LBracket.type, std::bind_front(&Parser::parseArrayLiteral, this));
 
         registerPrefix(tokens::Bang.type, std::bind_front(&Parser::parsePrefixExpression, this));
         registerPrefix(tokens::Minus.type, std::bind_front(&Parser::parsePrefixExpression, this));
+
+        registerPrefix(tokens::Not.type, std::bind_front(&Parser::parsePrefixExpression, this));
 
         registerPrefix(tokens::True.type, std::bind_front(&Parser::parseBooleanLiteral, this));
         registerPrefix(tokens::False.type, std::bind_front(&Parser::parseBooleanLiteral, this));
 
         registerPrefix(tokens::LParen.type, std::bind_front(&Parser::parseGroupedExpression, this));
+        registerPrefix(tokens::LSquirly.type, std::bind_front(&Parser::parseHashLiteral, this));
 
         registerPrefix(tokens::If.type, std::bind_front(&Parser::parseIfExpression, this));
         registerPrefix(tokens::Function.type, std::bind_front(&Parser::parseFunctionLiteral, this));
 
         registerInfix(tokens::Plus.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Minus.type, std::bind_front(&Parser::parseInfixExpression, this));
+        registerInfix(tokens::Assign.type, std::bind_front(&Parser::parseInfixExpression, this));
 
+        registerInfix(tokens::Mod.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Slash.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Asterisk.type, std::bind_front(&Parser::parseInfixExpression, this));
 
+        registerInfix(tokens::LBracket.type, std::bind_front(&Parser::parseIndexExpression, this));
+
         registerInfix(tokens::Eq.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Ne.type, std::bind_front(&Parser::parseInfixExpression, this));
+
+        registerInfix(tokens::Or.type, std::bind_front(&Parser::parseInfixExpression, this));
+        registerInfix(tokens::And.type, std::bind_front(&Parser::parseInfixExpression, this));
 
         registerInfix(tokens::Lt.type, std::bind_front(&Parser::parseInfixExpression, this));
         registerInfix(tokens::Gt.type, std::bind_front(&Parser::parseInfixExpression, this));
@@ -83,7 +100,8 @@ namespace arti::monkey {
             if (statementExp.has_value()) {
                 program->statements.push_back(statementExp.value());
             }
-            else return tl::unexpected<std::string>{ statementExp.error() };
+            else
+                return tl::unexpected<std::string>{ statementExp.error() };
 
             nextToken();
         }
@@ -119,7 +137,9 @@ namespace arti::monkey {
 
     tl::expected<void, std::string> Parser::peekTokenIs(Token_t tokenType) {
         if (peekToken.type != tokenType) {
-            return tl::unexpected<std::string>{ fmt::format("Expected next token to be '{}', got: '{}'", tokenType, peekToken.type) };
+            return tl::unexpected<std::string>{
+                fmt::format("Expected next token to be '{}', got: '{}'", tokenType, peekToken.type)
+            };
         }
 
         return {};
@@ -127,9 +147,11 @@ namespace arti::monkey {
 
     tl::expected<void, std::string> Parser::currentTokenIs(Token_t tokenType) {
         if (currentToken.type != tokenType) {
-            return tl::unexpected<std::string>{ fmt::format("Expected token to be '{}', got: '{}'", tokenType, currentToken.type) };
+            return tl::unexpected<std::string>{
+                fmt::format("Expected token to be '{}', got: '{}'", tokenType, currentToken.type)
+            };
         }
 
         return {};
     }
-}
+}    // namespace arti::monkey

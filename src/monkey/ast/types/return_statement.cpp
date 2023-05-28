@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include <fmt/format.h>
+
 namespace arti::monkey {
 
     ReturnStatement::ReturnStatement()
@@ -19,6 +21,14 @@ namespace arti::monkey {
         ss << ";";
 
         return ss.str();
+    }
+
+    std::string ReturnStatement::dumpAst(std::string indentation, std::string_view indentStr) const {
+        return fmt::format(
+            "{}Return\n{}", 
+            indentation,
+            returnValue->dumpAst(indentation + indentStr.data(), indentStr)
+        );
     }
 
 }    // namespace arti::monkey

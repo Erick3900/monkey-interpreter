@@ -36,4 +36,35 @@ namespace arti::monkey {
         return ss.str();
     }
 
+    std::string FunctionLiteral::dumpAst(std::string indentation, std::string_view indentStr) const {
+        std::stringstream ss;
+
+        ss << indentation << "FunctionLiteral\n";
+
+        indentation += indentStr.data();
+
+        ss << indentation << "Parameters\n";
+
+        std::list<std::string> parametersStrs;
+
+        std::ranges::for_each(
+            parameters, 
+            [&](Identifier *p) {
+                parametersStrs.emplace_back(p->dumpAst(indentation + indentStr.data(), indentStr));
+            }
+        );
+
+        ss << fmt::format(
+            "{}", 
+            fmt::join(parametersStrs, "\n")
+        );
+
+        ss << "\n";
+
+        ss << indentation << "Body\n";
+        ss << statement->dumpAst(indentation + indentStr.data(), indentStr);
+
+        return ss.str();
+    }
+
 }    // namespace arti::monkey

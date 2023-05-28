@@ -42,18 +42,23 @@ namespace arti::monkey {
 
         tl::expected<ASTNode *, std::string> parseStatement(Program *program);
         tl::expected<ASTNode *, std::string> parseLetStatement(Program *program);
+        tl::expected<ASTNode *, std::string> parseConstStatement(Program *program);
         tl::expected<ASTNode *, std::string> parseReturnStatement(Program *program);
         tl::expected<ASTNode *, std::string> parseExpressionStatement(Program *program);
         tl::expected<ASTNode *, std::string> parseBlockStatement(Program *program);
 
         tl::expected<ASTNode *, std::string> parseIdentifier(Program *program);
         tl::expected<ASTNode *, std::string> parseIntegerLiteral(Program *program);
+        tl::expected<ASTNode *, std::string> parseStringLiteral(Program *program);
         tl::expected<ASTNode *, std::string> parseBooleanLiteral(Program *program);
         tl::expected<ASTNode *, std::string> parseFunctionLiteral(Program *program);
+        tl::expected<ASTNode *, std::string> parseArrayLiteral(Program *program);
+        tl::expected<ASTNode *, std::string> parseHashLiteral(Program *program);
 
         tl::expected<ASTNode *, std::string> parseExpression(Program *program, expressions::Precedence precedence);
 
         tl::expected<ASTNode *, std::string> parseInfixExpression(Program *program, ASTNode *left);
+        tl::expected<ASTNode *, std::string> parseIndexExpression(Program *program, ASTNode *left);
         tl::expected<ASTNode *, std::string> parseCallExpression(Program *program, ASTNode *left);
         tl::expected<ASTNode *, std::string> parsePrefixExpression(Program *program);
         tl::expected<ASTNode *, std::string> parseGroupedExpression(Program *program);
@@ -61,6 +66,7 @@ namespace arti::monkey {
 
         tl::expected<std::vector<Identifier *>, std::string> parseFunctionParameters(Program *program);
         tl::expected<std::vector<ASTNode *>, std::string> parseCallArguments(Program *program);
+        tl::expected<std::vector<ASTNode *>, std::string> parseExpressionList(Program *program);
 
         expressions::Precedence peekPrecedence();
         expressions::Precedence currentPrecedence();

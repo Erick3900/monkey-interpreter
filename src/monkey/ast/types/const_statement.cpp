@@ -1,4 +1,4 @@
-#include "ast/types/let_statement.hpp"
+#include "ast/types/const_statement.hpp"
 
 #include <sstream>
 
@@ -6,11 +6,11 @@
 
 namespace arti::monkey {
 
-    LetStatement::LetStatement()
+    ConstStatement::ConstStatement()
         : name(nullptr)
         , value(nullptr) { }
 
-    std::string LetStatement::toString() const {
+    std::string ConstStatement::toString() const {
         std::stringstream ss;
 
         ss << tokenLiteral() << " " << name->toString() << " = ";
@@ -24,9 +24,9 @@ namespace arti::monkey {
         return ss.str();
     }
 
-    std::string LetStatement::dumpAst(std::string indentation, std::string_view indentStr) const {
+    std::string ConstStatement::dumpAst(std::string indentation, std::string_view indentStr) const {
         return fmt::format(
-            "{}Let\n{}\n{}", 
+            "{}Const\n{}\n{}", 
             indentation,
             fmt::format(
                 "{}Name\n{}",

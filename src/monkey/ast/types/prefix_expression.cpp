@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include <fmt/format.h>
+
 namespace arti::monkey {
 
     PrefixExpression::PrefixExpression()
@@ -12,6 +14,21 @@ namespace arti::monkey {
         std::stringstream ss;
 
         ss << "(" << op << right->toString() << ")";
+
+        return ss.str();
+    }
+
+    std::string PrefixExpression::dumpAst(std::string indentation, std::string_view indentStr) const {
+   std::stringstream ss;
+
+        ss << indentation << "Prefix\n";
+
+        indentation += indentStr.data();
+
+        ss << indentation << "Operator " << op << "\n";
+
+        ss << indentation << "Right\n";
+        ss << right->dumpAst(indentation + indentStr.data(), indentStr);
 
         return ss.str();
     }

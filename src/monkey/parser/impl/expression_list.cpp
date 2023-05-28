@@ -1,16 +1,18 @@
 #include "parser/parser.hpp"
 
+#include <fmt/format.h>
+
 #include "token/token_definitions.hpp"
 
 namespace arti::monkey {
 
-    tl::expected<std::vector<ASTNode *>, std::string> Parser::parseCallArguments(Program *program) {
-        std::vector<ASTNode *> args;
+    tl::expected<std::vector<ASTNode *>, std::string> Parser::parseExpressionList(Program *program) {
+        std::vector<ASTNode *> expressions;
 
         nextToken();
 
-        if (currentTokenIs(tokens::RParen.type)) {
-            return args;
+        if (currentTokenIs(tokens::RBracket.type)) {
+            return expressions;
         }
 
         tl::expected<ASTNode *, std::string> expectedExpression;
@@ -21,7 +23,7 @@ namespace arti::monkey {
             return tl::unexpected{ std::move(expectedExpression).error() };
         }
 
-        args.push_back(expectedExpression.value());
+        expressions.push_back(expectedExpression.value());
 
         while (peekTokenIs(tokens::Comma.type)) {
             nextToken();
@@ -33,14 +35,14 @@ namespace arti::monkey {
                 return tl::unexpected{ std::move(expectedExpression).error() };
             }
 
-            args.push_back(expectedExpression.value());
+            expressions.push_back(expectedExpression.value());
         }
 
-        if (auto expected = expectPeek(tokens::RParen.type); not expected) {
+        if (auto expected = expectPeek(tokens::RBracket.type); not expected) {
             return tl::unexpected{ std::move(expected).error() };
         }
 
-        return args;
+        return expressions;
     }
-
 }
+

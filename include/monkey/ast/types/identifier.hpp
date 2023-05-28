@@ -8,6 +8,7 @@ namespace arti::monkey {
         std::string_view value;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <fmt/format.h>
+
 namespace arti::monkey {
 
     ExpressionStatement::ExpressionStatement()
@@ -13,6 +15,14 @@ namespace arti::monkey {
         }
 
         return "";
+    }
+
+    std::string ExpressionStatement::dumpAst(std::string indentation, std::string_view indentStr) const {
+        return fmt::format(
+            "{}Expression\n{}", 
+            indentation, 
+            expression->dumpAst(indentation + indentStr.data(), indentStr)
+        );
     }
 
 }    // namespace arti::monkey

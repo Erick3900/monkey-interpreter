@@ -19,6 +19,7 @@ namespace arti::monkey {
         BlockStatement &operator=(const BlockStatement &) = default;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }

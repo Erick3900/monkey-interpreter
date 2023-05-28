@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "Error: " << valid_program.error() << std::endl;
             }
             else {
-                std::cout << valid_program.value()->toString() << std::endl;
+                std::cout << valid_program.value()->dumpAst("", "  ") << std::endl;
             }
         }
         else {

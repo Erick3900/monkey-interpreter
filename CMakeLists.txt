@@ -22,8 +22,8 @@ find_package(docopt CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
 
-file(GLOB_RECURSE SOURCES "src/monkey/**.cpp")
-file(GLOB_RECURSE TESTS "tests/**.cpp")
+file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/monkey/**.cpp")
+file(GLOB_RECURSE TESTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/**.cpp")
 
 add_library(
     ${PROJECT_NAME} STATIC

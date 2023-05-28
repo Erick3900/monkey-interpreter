@@ -19,6 +19,7 @@ namespace arti::monkey {
         IntegerLiteral &operator=(const IntegerLiteral &) = default;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }

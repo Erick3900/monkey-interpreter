@@ -18,6 +18,7 @@ namespace arti::monkey {
         PrefixExpression &operator=(const PrefixExpression &) = default;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }

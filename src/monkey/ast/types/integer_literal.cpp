@@ -1,4 +1,4 @@
-#include "ast/types/integer_litera.hpp"
+#include "ast/types/integer_literal.hpp"
 
 #include <fmt/format.h>
 
@@ -9,6 +9,10 @@ namespace arti::monkey {
 
     std::string IntegerLiteral::toString() const {
         return fmt::to_string(value);
+    }
+
+    std::string IntegerLiteral::dumpAst(std::string indentation, std::string_view indentStr) const {
+        return fmt::format("{}Integer {}", indentation, value);
     }
 
 }

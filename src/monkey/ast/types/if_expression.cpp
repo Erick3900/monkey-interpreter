@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include <fmt/format.h>
+
 namespace arti::monkey {
 
     IfExpression::IfExpression()
@@ -19,6 +21,25 @@ namespace arti::monkey {
         }
 
         return ss.str();
+    }
+
+    std::string IfExpression::dumpAst(std::string indentation, std::string_view indentStr) const {
+        auto ss = fmt::format(
+            "{}If\n{}\n{}", 
+            indentation, 
+            condition->dumpAst(indentation + indentStr.data(), indentStr),
+            consequence->dumpAst(indentation + indentStr.data(), indentStr)
+        );
+
+        if (alternative != nullptr) {
+            return ss + fmt::format(
+                "\n{}Else\n{}",
+                indentation,
+                consequence->dumpAst(indentation + indentStr.data(), indentStr)
+            );
+        }
+
+        return ss;
     }
 
 }    // namespace arti::monkey

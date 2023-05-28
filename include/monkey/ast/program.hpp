@@ -15,6 +15,7 @@ namespace arti::monkey {
         std::vector<ASTNode *> statements;
 
         std::string toString() const;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const;
 
         template <concepts::ASTNode NodeT, typename ...Args>
         [[nodiscard]] NodeT *newNode(Args &&...args) {

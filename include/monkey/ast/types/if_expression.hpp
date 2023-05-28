@@ -20,6 +20,7 @@ namespace arti::monkey {
         IfExpression &operator=(const IfExpression &) = default;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }

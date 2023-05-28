@@ -34,4 +34,32 @@ namespace arti::monkey {
         return ss.str();
     }
 
+    std::string CallExpression::dumpAst(std::string indentation, std::string_view indentStr) const {
+        std::stringstream ss;
+
+        ss << indentation << "CallExpression\n";
+
+        indentation += indentStr.data();
+
+        ss << indentation << "Function\n" << function->dumpAst(indentation + indentStr.data(), indentStr) << "\n";
+
+        ss << indentation << "Arguments\n";
+
+        std::list<std::string> argsStrs;
+
+        std::ranges::for_each(
+            arguments, 
+            [&](ASTNode *a) {
+                argsStrs.emplace_back(a->dumpAst(indentation + indentStr.data(), indentStr));
+            }
+        );
+
+        ss << fmt::format(
+            "{}", 
+            fmt::join(argsStrs, "\n")
+        );
+
+        return ss.str();
+    }
+
 }    // namespace arti::monkey

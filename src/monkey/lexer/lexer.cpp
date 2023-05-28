@@ -1,5 +1,7 @@
 #include "lexer/lexer.hpp"
 
+#include <iostream>
+
 #include <fmt/format.h>
 
 #include "utils/strings.hpp"
@@ -27,7 +29,23 @@ namespace arti::monkey {
         return { line.begin(), iter };
     }
 
-    
+    static constexpr std::string_view readString(std::string_view line) {
+        auto iter = line.begin();
+        ++iter;
+
+        while (iter != line.end() && *iter != '"') {
+            if (*iter == '\\') {
+                ++iter;
+                if (iter != line.end()) {
+                    ++iter;
+                }
+            }
+            else ++iter;
+        }
+
+        return { line.begin(), iter + 1 };
+    }
+
     static constexpr void skipWhitespace(std::string::iterator &iter, const std::string &line) {
         while (iter != line.end() && str::isWhitespace(*iter)) {
             ++iter;
@@ -124,16 +142,26 @@ namespace arti::monkey {
             switch(*iter) {
                 case '<': tok = tokens::Lt; break;
                 case '>': tok = tokens::Gt; break;
+                case '.': tok = tokens::Dot; break;
+                case '%': tok = tokens::Mod; break;
                 case '+': tok = tokens::Plus; break;
                 case '-': tok = tokens::Minus; break;
                 case ',': tok = tokens::Comma; break;
                 case '/': tok = tokens::Slash; break;
+                case ':': tok = tokens::Colon; break;
                 case '(': tok = tokens::LParen; break;
                 case ')': tok = tokens::RParen; break;
                 case '*': tok = tokens::Asterisk; break;
                 case '{': tok = tokens::LSquirly; break;
                 case '}': tok = tokens::RSquirly; break;
+                case '[': tok = tokens::LBracket; break;
+                case ']': tok = tokens::RBracket; break;
                 case ';': tok = tokens::Semicolon; break;
+                case '"': 
+                    tok.type = tokens::String.type;
+                    tok.literal = readString({ iter, sourceCode.end() });
+                    iter += (tok.literal.size() - 1);
+                    break;
                 case '=':
                     if (peek(iter, sourceCode) == '=') {
                         ++iter;

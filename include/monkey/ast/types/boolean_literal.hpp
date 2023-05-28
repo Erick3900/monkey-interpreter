@@ -17,6 +17,7 @@ namespace arti::monkey {
         BooleanLiteral &operator=(const BooleanLiteral &) = default;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }

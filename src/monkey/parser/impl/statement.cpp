@@ -8,6 +8,9 @@ namespace arti::monkey {
         if (currentToken.type == tokens::Let.type) {
             return parseLetStatement(program);
         }
+        else if (currentToken.type == tokens::Const.type) {
+            return parseConstStatement(program);
+        }
         else if (currentToken.type == tokens::Return.type) {
             return parseReturnStatement(program);
         }

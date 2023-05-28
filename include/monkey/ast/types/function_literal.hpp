@@ -23,6 +23,7 @@ namespace arti::monkey {
         FunctionLiteral &operator=(const FunctionLiteral &) = default;
 
         std::string toString() const override;
+        std::string dumpAst(std::string indentation, std::string_view indentStr) const override;
     };
 
 }
