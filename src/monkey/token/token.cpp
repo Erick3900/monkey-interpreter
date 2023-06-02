@@ -4,8 +4,8 @@
 
 namespace arti::monkey {
 
-    Token_t lookupIdent(Literal_t ident) {
-        if (auto it = keywords.find(ident); it != keywords.end()) {
+    Token_t lookupIdent(std::string_view ident) {
+        if (auto it = keywords.find(ident.data()); it != keywords.end()) {
             return it->second;
         }
 

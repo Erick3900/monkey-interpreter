@@ -12,50 +12,50 @@ namespace arti::monkey {
 
     namespace tokens {
 
-        inline constexpr Token EOF{ "EOF", "" };
-        inline constexpr Token Illegal{ "Illegal", "illegal" };
+        inline const Token EOF{ "EOF", "" };
+        inline const Token Illegal{ "Illegal", "illegal" };
 
-        inline constexpr Token Int{ "Int", "int" };
-        inline constexpr Token Ident{ "Ident", "ident" };
-        inline constexpr Token String{ "String", "string" };
+        inline const Token Int{ "Int", "int" };
+        inline const Token Ident{ "Ident", "ident" };
+        inline const Token String{ "String", "string" };
 
-        inline constexpr Token Dot{ "Dot", "." };
-        inline constexpr Token Mod{ "Modulo", "%" };
-        inline constexpr Token Plus{ "Plus", "+" };
-        inline constexpr Token Bang{ "Bang", "!" };
-        inline constexpr Token Minus{ "Minus", "-" };
-        inline constexpr Token Slash{ "Slash", "/" };
-        inline constexpr Token Colon{ "Colon", ":" };
-        inline constexpr Token Assign{ "Assign", "=" };
-        inline constexpr Token Asterisk{ "Asterisk", "*" };
+        inline const Token Dot{ "Dot", "." };
+        inline const Token Mod{ "Modulo", "%" };
+        inline const Token Plus{ "Plus", "+" };
+        inline const Token Bang{ "Bang", "!" };
+        inline const Token Minus{ "Minus", "-" };
+        inline const Token Slash{ "Slash", "/" };
+        inline const Token Colon{ "Colon", ":" };
+        inline const Token Assign{ "Assign", "=" };
+        inline const Token Asterisk{ "Asterisk", "*" };
 
-        inline constexpr Token Lt{ "LessThan", "<" };
-        inline constexpr Token Gt{ "GreaterThan", ">" };
+        inline const Token Lt{ "LessThan", "<" };
+        inline const Token Gt{ "GreaterThan", ">" };
 
-        inline constexpr Token Eq{ "Equal", "==" };
-        inline constexpr Token Ne{ "Not Equal", "!=" };
+        inline const Token Eq{ "Equal", "==" };
+        inline const Token Ne{ "Not Equal", "!=" };
 
-        inline constexpr Token Comma{ "Comma", "," };
-        inline constexpr Token Semicolon{ "Semicolon", ";" };
+        inline const Token Comma{ "Comma", "," };
+        inline const Token Semicolon{ "Semicolon", ";" };
 
-        inline constexpr Token LParen{ "Left Paren", "(" };
-        inline constexpr Token RParen{ "Right Paren", ")" };
-        inline constexpr Token LSquirly{ "Left Squirly", "{" };
-        inline constexpr Token RSquirly{ "Right Squirly", "}" };
-        inline constexpr Token LBracket{ "Left Bracket", "[" };
-        inline constexpr Token RBracket{ "Right Bracket", "]" };
+        inline const Token LParen{ "Left Paren", "(" };
+        inline const Token RParen{ "Right Paren", ")" };
+        inline const Token LSquirly{ "Left Squirly", "{" };
+        inline const Token RSquirly{ "Right Squirly", "}" };
+        inline const Token LBracket{ "Left Bracket", "[" };
+        inline const Token RBracket{ "Right Bracket", "]" };
 
-        inline constexpr Token If{ "If", "if" };
-        inline constexpr Token Or{ "Or", "or" };
-        inline constexpr Token Let{ "Let", "let" };
-        inline constexpr Token Not{ "Not", "not" };
-        inline constexpr Token And{ "And", "and" };
-        inline constexpr Token Else{ "Else", "else" };
-        inline constexpr Token True{ "True", "true" };
-        inline constexpr Token False{ "False", "false" };
-        inline constexpr Token Const{ "Const", "const" };
-        inline constexpr Token Return{ "Return", "return" };
-        inline constexpr Token Function{ "Function", "fn" };
+        inline const Token If{ "If", "if" };
+        inline const Token Or{ "Or", "or" };
+        inline const Token Let{ "Let", "let" };
+        inline const Token Not{ "Not", "not" };
+        inline const Token And{ "And", "and" };
+        inline const Token Else{ "Else", "else" };
+        inline const Token True{ "True", "true" };
+        inline const Token False{ "False", "false" };
+        inline const Token Const{ "Const", "const" };
+        inline const Token Return{ "Return", "return" };
+        inline const Token Function{ "Function", "fn" };
 
     }    // namespace tokens
 

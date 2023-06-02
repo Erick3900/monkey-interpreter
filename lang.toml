@@ -1,0 +1,152 @@
+[token.Illegal]
+type = "fallthrough"
+
+[token.Dot]
+type = "Chars"
+match = "."
+
+[token.Mod]
+type = "Chars"
+match = "%"
+
+[token.Plus]
+type = "Chars"
+match = "+"
+
+[token.Minus]
+type = "Chars"
+match = "-"
+
+[token.Slash]
+type = "Chars"
+match = "/"
+
+[token.Bang]
+type = "Chars"
+match = "!"
+
+[token.Colon]
+type = "Chars"
+match = ":"
+
+[token.Semicolon]
+type = "Chars"
+match = ";"
+
+[token.Asterisk]
+type = "Chars"
+match = "*"
+
+[token.Assign]
+type = "Chars"
+match = "="
+
+[token.Comma]
+type = "Chars"
+match = ","
+
+[token.LessThan]
+type = "Chars"
+match = "<"
+
+[token.GreaterThan]
+type = "Chars"
+match = ">"
+
+[token.Equal]
+type = "Chars"
+match = "=="
+
+[token.NotEqual]
+type = "Chars"
+match = "!="
+
+[token.LParen]
+type = "Chars"
+match = "("
+
+[token.RParen]
+type = "Chars"
+match = ")"
+
+[token.LSquirly]
+type = "Chars"
+match = "{"
+
+[token.RSquirly]
+type = "Chars"
+match = "}"
+
+[token.LBracket]
+type = "Chars"
+match = "["
+
+[token.RBracket]
+type = "Chars"
+match = "]"
+
+[token.if]
+type = "Keyword"
+
+[token.else]
+type = "Keyword"
+
+[token.or]
+type = "Keyword"
+
+[token.and]
+type = "Keyword"
+
+[token.let]
+type = "Keyword"
+
+[token.const]
+type = "Keyword"
+
+[token.false]
+type = "Keyword"
+
+[token.true]
+type = "Keyword"
+
+[token.null]
+type = "Keyword"
+
+[token.return]
+type = "Keyword"
+
+[token.fn]
+type = "Keyword"
+
+[token.not]
+type = "Keyword"
+
+[token.while]
+type = "Keyword"
+
+[token.for]
+type = "Keyword"
+
+[token.BooleanAnd]
+type = "Chars"
+match = "&&"
+
+[token.BooleanOr]
+type = "Chars"
+match = "||"
+
+[token.BitAnd]
+type = "Chars"
+match = "&"
+
+[token.BitOr]
+type = "Chars"
+match = "|"
+
+[token.BitXor]
+type = "Chars"
+match = "^"
+
+[token.BitNot]
+type = "Chars"
+match = "~"
